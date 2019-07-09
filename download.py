@@ -5,6 +5,7 @@
 # Downloader tool without GUI
 
 import sys
+import os
 import signal
 
 from gmapcatcher.mapUtils import *
@@ -69,6 +70,12 @@ def get_args(sys_argv):
     return args
 
 if __name__ == "__main__":
+    mConf = MapConf()
+    ## Here we can overwrite some of the config values
+    print( "Map Service: {}".format( mConf.map_service ) )
+    # print mConf.repository_type
+    ctx_map = MapServ(mConf)
+
     args = get_args(sys.argv)
 
     if (args.location is None):
@@ -86,11 +93,6 @@ if __name__ == "__main__":
         print "Download path in %s, mapsource: \"%s %s\", zoom level: %d to %d, width=%d tiles" % \
                 (args.gpx, '', '', args.max_zl, args.min_zl, args.width)
 
-    mConf = MapConf()
-    ## Here we can overwrite some of the config values
-    # print mConf.map_service
-    # print mConf.repository_type    
-    ctx_map = MapServ(mConf)
     downloader = MapDownloader(ctx_map, args.nr_threads)
     try:
         if args.gpx is not None:
