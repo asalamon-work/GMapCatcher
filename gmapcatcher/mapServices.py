@@ -115,6 +115,7 @@ class MapServ:
             import mapServers.maps4free as map_server
         elif map_service == MAP_SERVERS[GOOGLE]:
             import mapServers.googleMaps as map_server
+        #print( "MapService: {} {}".format( map_service, map_server ) )
         return map_server
 
     ## Get the URL for the given coordinates

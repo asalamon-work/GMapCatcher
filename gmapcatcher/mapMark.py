@@ -10,16 +10,17 @@ from mapConst import *
 class MyMarkers:
     # coord = (lat, lng, zoom_level)
     positions = {}
+    comments = []
 
     def refresh(self):
         self.positions = {}
         self.read_markers()
 
     def read_markers(self):
-        self.positions = fileUtils.read_file('marker', self.markerPath)
+        self.positions, self.comments = fileUtils.read_file('marker', self.markerPath, comments=True)
 
     def write_markers(self):
-        fileUtils.write_file('marker', self.markerPath, self.positions)
+        fileUtils.write_file('marker', self.markerPath, self.positions, self.comments)
 
     def append_marker(self, coord, strName=None, extraTag=False):
         if strName is None:

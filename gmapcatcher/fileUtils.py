@@ -8,8 +8,9 @@ from time import time
 
 
 ## Return all the locations from a given file (filePath)
-def read_file(strInfo, filePath, maxLine=0):
+def read_file(strInfo, filePath, maxLine=0, comments=False):
     fileData = {}
+    commentData = []
     if os.path.exists(filePath):
         p = re.compile(strInfo + '="([^"]+)".*lat="([^"]+)".*lng="([^"]+)".*')
         q = re.compile('.*zoom="([^"]+)".*')
@@ -32,20 +33,28 @@ def read_file(strInfo, filePath, maxLine=0):
                         fileData[name] = (float(m.group(2)),
                                                 float(m.group(3)),
                                                 zoom)
+                    elif comments is True:
+                        commentData.append( line )
+                elif comments is True:
+                    commentData.append( line )
+
                 if (maxLine > 0):
                     if (len(fileData) > maxLine):
                         break
             except:
                 pass
         file.close()
-        return fileData
+        if comments is True:
+            return fileData, commentData
+        else:
+            return fileData
     else:
         write_file(strInfo, filePath, fileData)
         return None
 
 
 ## Writes all the locations (fileData) to given file (filePath)
-def write_file(strInfo, filePath, fileData):
+def write_file(strInfo, filePath, fileData, comments=None):
     try:
         file = open(filePath, "w")
     except Exception:
@@ -53,18 +62,23 @@ def write_file(strInfo, filePath, fileData):
         print '  ' + filePath
         return
 
-    file.write(codecs.BOM_UTF8+"# This is the " + strInfo + "s file used by GMapCatcher.\n" +
-        "#\n" +
-        "# This file contains a list of Locations/Position.\n" +
-        "# Each entry should be kept on an individual line,\n" +
-        "# and MUST have a unique name.\n" +
-        "# The latitude, longitud and zoom should be TAB separated.\n" +
-        "#\n" +
-        "# Additionally, comments (such as these) may be inserted on\n" +
-        "# lines sarting with a '#' symbol.\n" +
-        "#\n" + "# For example:\n" + "#\n" +
-        ('#   ' + strInfo + '="%s"\tlat="%f"\tlng="%f"\tzoom="%i"\n' %
-         ("Paris, France", 48.856667, 2.350987, 5)) + "#\n")
+    if comments is None:
+        file.write(codecs.BOM_UTF8+"# This is the " + strInfo + "s file used by GMapCatcher.\n" +
+            "#\n" +
+            "# This file contains a list of Locations/Position.\n" +
+            "# Each entry should be kept on an individual line,\n" +
+            "# and MUST have a unique name.\n" +
+            "# The latitude, longitud and zoom should be TAB separated.\n" +
+            "#\n" +
+            "# Additionally, comments (such as these) may be inserted on\n" +
+            "# lines sarting with a '#' symbol.\n" +
+            "#\n" + "# For example:\n" + "#\n" +
+            ('#   ' + strInfo + '="%s"\tlat="%f"\tlng="%f"\tzoom="%i"\n' %
+             ("Paris, France", 48.856667, 2.350987, 5)) + "#\n")
+    else:
+        #file.write(codecs.BOM_UTF8)
+        for com in comments:
+            file.write( com )
 
     for l in sorted(fileData.keys()):
         # The method 'write' takes an unicode string here and acording to python manual
